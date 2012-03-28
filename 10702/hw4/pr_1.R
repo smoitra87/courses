@@ -1,3 +1,6 @@
+
+nSamples=100
+
 bin_pdf <- function(x) {
 	x1 <- x[1]
 	x2 <- x[2]
@@ -30,5 +33,15 @@ for(i in 1:8) {
 	p[i] <- bin_pdf(bin_vals[i,])
 }
 
-samp <- sample(1:8,100,replace=TRUE,prob=p)
+samp <- sample(1:8,nSamples,replace=TRUE,prob=p)
+count <- rep(0,8)
+for(i in 1:8) {
+	count[i] <- sum(samp==i)
+}
+x1 <- bin_vals[,1]
+x2 <- bin_vals[,2]
+x3 <- bin_vals[,3]
+
+out = glm(count~ x1+x2+x3+x1*x2+x2*x3+x1*x3+x1*x2*x2,family="poisson")
+summary(out)
 
