@@ -41,7 +41,7 @@ sample_post <- function(size) {
 	return(samp)
 }
 
-nFunc <- 10
+nFunc <- 1000
 nPoints <- 100
 alpha=alpha + nPt
 S <- matrix(rep(0,nFunc*nPoints),nFunc)
@@ -72,18 +72,53 @@ for(ff in 1:nFunc) {
 	}
 	W_cdf[ff,] <- w_cdf
 	S_s[ff,] <- s_sorted
-	plot(c(s_sorted[1]-3,s_sorted,s_sorted[length(s_sorted)]+3),c(0,w_cdf,1),type = "s",xaxt="n", xlab = "x", ylab = "F(x)", main = "Cumulative distribution function",col="blue",yaxt="n")
-	par(new=T)
+	#plot(c(s_sorted[1]-3,s_sorted,s_sorted[length(s_sorted)]+3),c(0,w_cdf,1),type = "s",xaxt="n", xlab = "x", ylab = "F(x)", main = "Cumulative distribution function",col="blue",yaxt="n")
+	#par(new=T)
 }
 
-# Now plot the Mean of all the Fs and also F0
-mean_w <- colMeans(W_cdf)
-mean_s <- colMeans(S_s)
-x <- seq(-5,20,by=0.1)
+# Returns cdf of sample distribution
+pdraw <- function(w_cdf,s_s,x) {
+	if(x<s_s[1]) {
+		return(0)
+	}
+	if(x >= s_s[length(s_s)]) {
+		return(1)
+	}
+	
+	for(i in 1:length(s_s)-1) {
+		if(x>=s_s[i] && x<s_s[i+1]){
+			return(w_cdf[i])
+		}
+	}
+}
 
-#plot(mean_s,mean_w,type="s",col="blue")
+# cdf of some chosen points
+seq_chosen <- seq(-5,20,by=0.5)
+cdf_chosen <- matrix(rep(0,nFunc*length(seq_chosen)),nFunc)
+ 
+for(ff in 1:nFunc) {
+	w_cdf <- W_cdf[ff,]
+	s_s <- S_s[ff,]
+	for(i in 1:length(seq_chosen)) {
+		x <- seq_chosen[i]	
+		cdf_chosen[ff,i] <- pdraw(w_cdf,s_s,x)
+	}
+}
+
+
+# Plot the mean distribution
+mean_chosen <- colMeans(cdf_chosen)
+sd_chosen <- sd(cdf_chosen)
+interval <- sd_chosen*qnorm(0.975)
+plot(seq_chosen,mean_chosen,type="l",col="blue",lwd=5,main="Posterior Band")
+lines(seq_chosen,mean_chosen-interval,type="l",lty=3,col="magenta",lwd=3)
 #par(new=T)
-plot(x,F(x),type="l",col="red",lwd=5)
+lines(seq_chosen,mean_chosen+interval,type="l",lty=3,col="magenta",lwd=3)
+
+
+#x <- seq(-5,20,by=0.1)
+# Plot the true distribution
+lines(seq_chosen,F(seq_chosen),type="l",col="red",lwd=5)
 dev.off()
 
 
