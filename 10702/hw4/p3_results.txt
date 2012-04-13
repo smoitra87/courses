@@ -1,0 +1,29 @@
+> summary(out)
+
+Call:
+glm(formula = count ~ x1 + x2 + x3 + x1 * x2 + x2 * x3 + x1 * 
+    x3 + x1 * x2 * x2, family = "poisson")
+
+Deviance Residuals: 
+       1         2         3         4         5         6         7         8  
+ 0.67325  -1.03094  -1.03094   0.67325  -0.22973   0.19222   0.08235  -0.08071  
+
+Coefficients:
+            Estimate Std. Error z value Pr(>|z|)  
+(Intercept)  -0.7581     1.2615  -0.601   0.5479  
+x1            2.4685     1.2948   1.907   0.0566 .
+x2            0.1259     1.4472   0.087   0.9307  
+x3            0.1259     1.4472   0.087   0.9307  
+x1:x2         1.8886     1.4485   1.304   0.1923  
+x2:x3        -0.2517     0.5884  -0.428   0.6688  
+x1:x3         0.1744     1.4478   0.120   0.9041  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 181.6472  on 7  degrees of freedom
+Residual deviance:   3.1352  on 1  degrees of freedom
+AIC: 39.736
+
+Number of Fisher Scoring iterations: 5
