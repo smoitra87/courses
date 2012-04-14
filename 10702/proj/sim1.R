@@ -1,9 +1,16 @@
+library('glasso')
+
 set.seed(100)
 x<-matrix(rnorm(50*20),ncol=20)
 s<- var(x)
 a<-glasso(s, rho=.01)
 aa<-glasso(s,rho=.02, w.init=a$w, wi.init=a$wi)
 
+png('glasso1.png');
+x = aa$wi
+x = x > 0
+image(x)
+dev.off()
 
 #----------------------------------------------------------
 # Part 2
