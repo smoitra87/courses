@@ -18,6 +18,7 @@ def pollard(N) :
 		d = gcd(abs(left-right),N)
 		if PRINT_TRACE : 
 			print(left,right,d)
+	if d == N : 
 		print("Failure")
 	else :
 		print("non trivial factor is %d"%d)
