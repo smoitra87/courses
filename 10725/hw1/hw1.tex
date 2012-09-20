@@ -58,6 +58,9 @@ $[$3 pts$]$ Given that the sets $f(X)$ and $f(Y)$ are disjoint, find a hyperplan
 \end{enumerate}
 Here, $f(A) = \{ y \mid y = f(x), x\in A\}$.
 
+Note that $f(x) = Cx + d$ is an affine transformation. We know that convexity is preserved under an affine transformation. f(X) and f(Y) are convex disjoint sets. From the separating hyperplane theorem we know that there exists a separating hyperplane between f(X) and f(Y). We can construct this hyperplane. 
+
+
 \subsection{Voronoi Decomposition}
 
 Let $a,b\in\mathbb{R}^n$ such that $a\ne b$.
@@ -65,6 +68,8 @@ Let $a,b\in\mathbb{R}^n$ such that $a\ne b$.
 \item
 $[$2 pts$]$  Show that the set $\{ x \mid \Vert x-a \Vert_2 \le \Vert x-b \Vert_2\}$ is a halfspace.
 \end{enumerate}
+
+Consider the hyperplane with normal defined by the line joining b and a and passing through the midpoint of a and b. It is represented as $(b-a)^T(x-\frac{a+b}{2})$ . Any point x closer to a than b will make an obtuse angle with $x-\frac{a+b}{2}$ and $b-a$. So, the dot product between these two will be negative. Similarly, any point x closer to b than a will make an acute angle with $x-\frac{a+b}{2}$ and $b-a$ causing the dot product between the two to be positive. We have thus shown that all points which are closer to a than b lie on one side of the hyperplane . This defines a halfspace. 
 
 \vspace{.25cm} 
 
@@ -74,6 +79,8 @@ $[$2 pts$]$  Show that the set $\{ x \mid \Vert x-a \Vert_2 \le \Vert x-b \Vert_
 $[$2 pts$]$  Show that $V_1$ is a polyhedron.  That is, $V_1 = \{x \mid A_1x \le b_1\}$.
 \end{enumerate}
 
+Each constraint $\Vert x_i-x \Vert_2 \le \Vert x_j-x \Vert_2$ defines a halfspace. $V_1$ is the intersection of a bunch of halfspaces which defines a polyhedron. 
+
 \vspace{.25cm}
 
 \noindent Let $P_i = \{x \mid A_ix \le b_i\}$ be disjoint polyhedra that cover $\mathbb{R}^n$.
@@ -81,6 +88,15 @@ $[$2 pts$]$  Show that $V_1$ is a polyhedron.  That is, $V_1 = \{x \mid A_1x \le
 \item
  $[$3 pts$]$  Does there exist points $x_1,\ldots,x_k\in\mathbb{R}^n$ such that $V_i = P_i$ for $i = 1,\ldots,k$?  If so, provide the points, otherwise construct a counterexample.
 \end{enumerate}
+
+No, not every polyhedral arrangement needs to give rise to a voronoi diagram. 
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=\textwidth]{voronoi}
+  \caption{Impossible Voronoi tesselation}
+\end{figure}
+
+\clearpage
 
 \subsection{Farkas' Lemma}
 
@@ -92,6 +108,47 @@ $[$6 pts$]$  Show that {\bf either} there exists $x > 0$ where $Ax = b$, {\bf or
 \end{enumerate}
 Hint: First show that $c^Tx = d$ for all $x$ such that $Ax = b$ if and only if there exists $\lambda$ such that $c= A^T\lambda, d=b^T\lambda$.
 
+The proof of Farkas's lemma is as follows : 
+\begin{itemize}
+\item We show that it is not possible for both conditions to be satisfied at the same time
+\item We show that if the first condition is false then the second condition is true
+\end{itemize}
+
+
+Part 1 : To show that both the conditions cannot be satisfied at the same time. 
+
+Suppose that $\exists x \ge 0$ s.t. $Ax=b$ and $\exists \lambda$ s.t. $A^T\lambda \geq 0$ and $b^T\lambda \leq 0$ . Then by joining both results we have $\lambda^TAx = \lambda^Tb$. This is not possible since $\lambda^TA \geq 0$ and $x \geq 0$ would imply that $\lambda^Tb$ should be non-negative. Hence it is not possible for both conditions to be simultaneously satisfied. 
+
+Part 2 : If the first condition is false then the second condition is true
+
+For this we need the projection theorem. Let K be a convex set and $b \notin K$. Let p is the projection of b on k. i.e. $p = \inf_{x \in K}\Vert x - b \Vert$ . Then for any $x \in K$ we have that $(b-p)^T(x-p) \leq 0$ since the two vectors have an obtuse included angle. 
+
+Now consider that $!\exists x \geq 0$ s.t. $Ax=b$. This means that $b \notin K $ where $K = \{ Ax : x \geq 0\}$. In other words b does not lie in the convex cone of A. We will show that this implies that $\exists \lambda$ s.t. $A^T\lambda \geq 0$ and $b^T\lambda \leq 0$ . 
+
+Let the projection of b on K be $Aw$ where $w \geq 0$ and let $x \geq 0$. Then from the projection them. Let $Aw-b$ be $\lambda$. 
+\begin{align*}
+(b-Aw)^T(Ax-Aw) \leq 0  \\
+-\lambda^TA(x-w) \leq 0 \\
+(x-w)^TA^T\lambda \geq 0 \forall x \geq 0 \\
+\end{align*}
+By choosing $x = w + \textbf{1}_{mx1} $ we can get $A^T\lambda \geq 0$
+
+\begin{equation}
+\label{eq1}
+\lambda^Tb = \lambda^T(Aw-\lambda) = \lambda^TAw - \lambda^T\lambda
+\end{equation}
+
+\begin{align*}
+= (b-Aw)^T(Ax-Aw) \leq 0 \text{ [from projection them] }\\
+= -\lambda^T(-Aw) \leq 0 \text{ [if $x=0$] } \\
+= \lambda^T Aw \leq 0
+\end{align*}
+and
+Since $\lambda =Aw-b$ and $b \notin K$, so $Aw-b \neq 0 => \lambda^T\lambda > 0 => \lambda^T\lambda  < 0$ 
+
+Plugging these two inequalities back into \ref{eq1} we get $\lambda^Tb = \lambda^T(Aw-\lambda) = \lambda^TAw - \lambda^T\lambda < 0$. This concludes part 2. 
+
+
 \subsection{Functions}
 
 \begin{enumerate}[(a)]
@@ -102,18 +159,18 @@ Hint: consider the log-sum-exp and geometric mean functions in Boyd.
 
 \vspace{.5cm}
 
-\noindent Let $G = (V,E,c,s,t)$ be an undirected graph with edge capacities $c(u,v) \ge 0$, source vertex $s$ and sink vertex $t$.  We say a vector $y\in\mathbb{R}^E$ is a valid {\em s-t-flow} if:
-\begin{itemize}
-\item $y(u,v) \le c(u,v), \forall (u,v)\in E$, ({\em Capacity})
-\item $y(u,v) = -y(v,u), \forall (u,v)\in E$, and ({\em Skew Symmetry})
-\item $\sum_{v\in V} y(u,v) = 0, \forall u\in V\setminus\{s,t\}$. ({\em Flow Conservation})
-\end{itemize}
-Let $f(x) = \min_y \Vert x - y \Vert$, subject to: $y$ is a valid s-t-flow.
 \begin{enumerate}[(b)]
 \item
 $[$2 pts$]$  Show that $f(x)$ is convex.
 \end{enumerate}
 
+The constraints on y are linear constraints which make the feasible space of y convex. 
+
+\begin{align*}
+f(x) = \min_y g(x,y) = \min_y \Vert x - y \Vert 
+\end{align*}
+
+$x-y$ is linear in x and y and hence convex. All norms are convex and hence $\Vert x - y \Vert$ is convex. Minimizing along a variable which is convex gives a convex function. 
 \newpage
 \clearpage
 
@@ -202,18 +259,17 @@ As discussed in class, there are often more than one way to formulate an optimiz
 
 \subsection{Rank 1 approximation of matrices }
  
-In this problem, we will set up minimizing the squared error between a given $m\times n$ matrix $A$ and a rank 1 matrix $X$. 
-
-\begin{equation}
-\text{minimize}_{\text{rank}(X)=1} ||A-X||^{2}\\
-\nonumber
-\end{equation}
-
 \begin{enumerate}[(a)]
 \item 
 $[$1.5 pts$]$ How can you reformulate the objective function and the constraint of the above optimization by writing the space of rank 1 matrices as outer products of two vectors?
 \end{enumerate}
 \vspace{.25cm}
+
+\begin{align*}
+\text{minimize} \Vert A-UV^T \Vert^{2}
+\end{align*}
+
+where $U \in \mathbb{R}^{m}$ and $V \in \mathbb{R}^{n}$
 
 \begin{enumerate}[(b)]
 \item
@@ -221,16 +277,40 @@ $[$1.5 pts$]$ One possible disadvantage of writing the space of rank 1 matrices 
 \end{enumerate}
 \vspace{.25cm}
 
+\begin{align*}
+\text{minimize} \Vert A-\beta UV^T \Vert^{2} \\
+\text{s.t.} \Vert U\Vert = 1 \text{ and }\Vert V \Vert =1 
+\end{align*}
+
+where $U \in \mathbb{R}^{m}$ and $V \in \mathbb{R}^{n}$
+
+
 \begin{enumerate}[(c)]
 \item 
 $[$3 pts$]$ We started with one optimization variable $X$, but now we have more than one. How can you reduce the number of optimization variables in (b)? Show your work. {\it Hint:} try to show that one of the optimization variables is determined when others are fixed.
 \end{enumerate}
 \vspace{.25cm}
 
+\begin{align*}
+\text{minimize} \Vert A- UV^T \Vert^{2} \\
+\text{s.t.} \Vert U\Vert = 1 
+\end{align*}
+
+where $U \in \mathbb{R}^{m}$ and $V \in \mathbb{R}^{n}$
+
+When the $||U||$ is set to 1 then V is equally adjusted as well. The scaling factor $\beta$ is no longer needed since it is absorbed into V. 
+
 \begin{enumerate}[(d)]
 \item 
 $[$2 pts$]$ Reformulate the optimization problem in (c) into an equivalent minimization problem with a bi-linear objective function.
 \end{enumerate}
+
+\begin{align*}
+\text{minimize} \Vert A- UV^T \Vert^{2} \\
+\text{s.t.} \Vert U\Vert = 1 
+\end{align*}
+
+
 \vspace{.25cm}
 
 \subsection{Partial minimization of the lasso problem}
@@ -248,27 +328,46 @@ In this problem, we derive the partial minimization of the lasso problem.
 \item 
 $[$2 pts$]$ How would you reformulate the optimization if we only care about the sparsity of the first $k$ elements of $\mathbf{x}$: $x_{1},x_{2},\cdots,x_{k}$. 
 \end{enumerate}
+
+\begin{equation}
+	\text{min}||\mathbf{y}-A\mathbf{x}||_{2}^{2}+\lambda \sum_{i=1}^{k} |x_i|
+	\label{lasso}
+	\nonumber
+\end{equation}
+
+
 \vspace{.25cm}
 
 \begin{enumerate}[(b)]
 \item 
 $[$3 pts$]$ Show how you can eliminate $x_{k+1},x_{k+2},\cdots,x_{n}$ from the objective function.
 \end{enumerate}
+
+Consider A in the block matrix form $A = [A_1 A_2]$ such that $A_1 \in \mathcal{R}^{dxk}$ and $A_2 \in \mathcal{R}^{dx(n-k)}$. Then the optimization problem is 
+
+\begin{equation}
+	\text{min}||\mathbf{y}-A_1\mathbf{x_{1:k}}||_{2}^{2}+\lambda \sum_{i=1}^{k} |x_i|
+	\label{lasso}
+	\nonumber
+\end{equation}
+
+
 \vspace{.25cm}
 
 \subsection{Equality constraint}
-
-Consider an convex optimization problem with equality constraint,
-\begin{eqnarray*}
-&\text{minimize   } f(x)\\
-&\text{subject to   } Ax = b\\
-\end{eqnarray*}
-Assume that the feasible set is non-empty.
 
 \begin{enumerate}[(a)]
 \item 
 $[$3 pts$]$Can you remove the equality constraint by reformulating $x$ as a linear function of $z$. What conditions does the parameters of your linear function need to satisfy?
 \end{enumerate}
+
+\begin{eqnarray*}
+&\text{minimize   } f(Fz+x_0)\\
+&\text{subject to   } f_i(Fz+x_0) \leq 0, & \text{i=1..m}
+\end{eqnarray*}
+
+where $x_0$ denotes any solution to the equality constraints, $F \in \mathbb{R}^{n\times k }$ is a matrix with $\mathcal{R}(F) = \mathcal{N}(A)$ where $z \in \mathbb{R}^k$
+
 \vspace{.25cm}
 
 \subsection{Building a box-shape structure}
