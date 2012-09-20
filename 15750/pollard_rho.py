@@ -2,7 +2,13 @@ import sys
 from fractions import gcd
 
 
-PRINT_TRACE = True
+"""
+Example
+
+$ python pollard_rho.py 18446744073709551617 2
+"""
+
+PRINT_TRACE = False
 
 def pseudo(x,N)  :
 	""" Generates a pesudo random number"""
