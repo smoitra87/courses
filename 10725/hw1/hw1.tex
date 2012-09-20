@@ -41,6 +41,14 @@ Let $A\subseteq\mathbb{R}^n$ be a closed set with non-empty interior that has a 
 Show that $A$ is convex.
 \end{enumerate}
 
+We will prove this by contradiction. Let us assume that A is not a convex set. Then $\exists$ points $x_1 , x_2 \in A$ s.t. $\theta x_1 + (1-\theta) x_2 \notin A$ for some $\theta \in [0,1]$. Also we know that since A has a supporting hyperplane on every point on its boundary then any hyperplane $a^Tx+b$, on the boundary of A satisfies, $a^Tx_1+b\leq 0$ and $a^Tx_2+b\leq 0$ . But since, $\theta x_1 + (1-\theta) x_2 \notin A$ then there must also exist a hyperplane such that $a^T(\theta x_1 + (1-\theta) x_2)+b > 0$ . We will show that this is impossible. 
+\begin{align*}
+a^T(\theta x_1 + (1-\theta) x_2)+b > 0 \\
+a^T(\theta x_1 + (1-\theta) x_2)+\theta b + (1-\theta)b > 0\\
+\theta(a^T x_1+b) + (1-\theta)(a^T x_2+b)  > 0 \\
+\end{align*}
+But, $ a^Tx_1+b\leq 0$ and $a^Tx_2+b\leq 0$. So, $\theta(a^T x_1+b) + (1-\theta)(a^T x_2+b) \leq 0 $. We arrive a contradiction and hence A is convex.
+
 \vspace{.25cm}
 
 \noindent Let $X,Y\subseteq\mathbb{R}^n$ be disjoint convex sets, let $\{x \mid a^Tx + b = 0\}$ be a separating hyperplane and let $f(x) = Cx + d$ be a function, where $C\in\mathbb{R}^{m\times n},d\in\mathbb{R}^m$.
