@@ -56,10 +56,16 @@ But, $ a^Tx_1+b\leq 0$ and $a^Tx_2+b\leq 0$. So, $\theta(a^T x_1+b) + (1-\theta)
 \item
 $[$3 pts$]$ Given that the sets $f(X)$ and $f(Y)$ are disjoint, find a hyperplane, $\{ y \mid \alpha^Ty + \beta = 0 \}$, that separates $f(X)$ and $f(Y)$.
 \end{enumerate}
-Here, $f(A) = \{ y \mid y = f(x), x\in A\}$.
 
-Note that $f(x) = Cx + d$ is an affine transformation. We know that convexity is preserved under an affine transformation. f(X) and f(Y) are convex disjoint sets. From the separating hyperplane theorem we know that there exists a separating hyperplane between f(X) and f(Y). We can construct this hyperplane. 
+We have that $y = Cx+d$. Let $B \in \mathbb{R}^{n\times m} $ be the left inverse of C. Multiplying the equation on both sides by B, we get. $By = BCx +Bd$ . This simplifies to $x = B(y-d)$ . Hence we have a mapping from y to x. Substituting this mapping into the original hyperplane we obtain
 
+\begin{align*}
+a^Tx+b = 0\\
+a^TB(y-d)+b = 0 \\
+a^TBy - a^TBd + b = 0 \\
+\end{align*}
+
+So we obtain that $\alpha = B^Ta$ and $\beta = b-a^TBd$
 
 \subsection{Voronoi Decomposition}
 
@@ -375,6 +381,17 @@ You are asked to build a box-shape structure. The area of the wall paper provide
 \begin{enumerate}[(a)]
 \item $[$2 pts$]$ Formulate your optimization problem as a maximization problem. Show your objective functions and constraints.
 \end{enumerate}
+
+\begin{align*}
+\text{ maximize } hdw \\
+\text{s.t. } dw <= A_{floor} \\
+2(hd +hw) <= A_{wall} \\
+\alpha <= h/w <= \beta \\
+\gamma \leq w/d \leq \delta \\
+w>0 \\
+d>0 \\
+h>0  \\
+\end{align*}
 \vspace{.25cm}
 
 \begin{enumerate}[(b)]
@@ -386,6 +403,19 @@ You are asked to build a box-shape structure. The area of the wall paper provide
 \end{eqnarray*}
 where $g_{i}(x) = c_{i}x_{1}^{a_{1}}x_{2}^{a_{2}}\cdots x_{n}^{a_{n}}, (c_{i}>0, a_{j}\in \mathcal{R}$) and $f_{i}(x) = \sum_{k=1}^{K}c_{i,k}x_{1}^{a_{1k}}x_{2}^{a_{2}}\cdots x_{n}^{a_{nk}}, (c_{i,k}>0, a_{ik}\in \mathcal{R})$. Recently, efficient and robust algorithms have been developed to solve even large-scale geometric programs. Convert the optimization problem in (a) into a geometric programming problem.
 \end{enumerate}
+
+\begin{align*}
+\text{minimize } h^{-1}d^{-1}w^{-1} \\
+\text{s.t. } \frac{1}{A_{floor}}dw \leq 1 \\
+\frac{2}{A_{wall}}(hd+hw)  \leq 1 \\
+wh^{-1} \leq \alpha \\
+hw^{-1} \leq \beta \\
+dw^{-1} \leq \gamma \\
+wd^{-1} \leq \delta \\
+1-h \leq 1 \\
+1-d \leq 1 \\
+1-w \leq 1
+\end{align*}
 \vspace{.25cm}
 
 %\begin{enumerate}[(b)]
