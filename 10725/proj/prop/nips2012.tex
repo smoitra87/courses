@@ -1,0 +1,112 @@
+\documentclass{article} % For LaTeX2e
+\usepackage{nips12submit_e,times,amsmath,hyperref}
+%\documentstyle[nips12submit_09,times,art10]{article} % For LaTeX 2.09
+
+
+\title{Molecular Mechanics Force Field Optimization}
+
+
+\author{
+Subhodeep Moitra\\
+Language Technologies Institute\\
+\texttt{subhodee@andrew.cmu.edu} \\
+\And
+Chunlei Liu \\
+Physics Department \\
+\texttt{chl56@andrew.cmu.edu} \\
+\And
+Meghana Kshirsagar \\
+Language Technologies Institute\\
+\texttt{mkshirsa@gmail.com}
+}
+
+
+\newcommand{\fix}{\marginpar{FIX}}
+\newcommand{\new}{\marginpar{NEW}}
+
+\nipsfinalcopy % Uncomment for camera-ready version
+
+\begin{document}
+
+
+\maketitle
+
+\section{Introduction}
+In this project we propose to study and optimize molecular mechanics energy functions. Each biological macromolecule has an associated energy function which determines its shape and stability. This energy function E is normally defined in terms of the biophysical properties of the atoms in the macromolecule. E is also related to the three dimensional shape taken by the biological macromolecule. E encompasses electrostatic calculations, van der waals forces and even explicit modelling of the hydrogen bonds \cite{Boas2007}. The macromolecule can assume a number of different conformations or shapes which gives rise to different energy values. The natively occurring conformation is the one that is most stable and also has the lowest energy E*. Finding the global minima of this function is referred to as the \emph{protein structure prediction problem}. Minimizing this function is very very hard as E has a rugged landscape. In practice, local minima of the energy function are found by a number of heuristics such as simulated annealing. 
+
+The molecular mechanics energy function.
+\begin{align*}
+E_{total} = \sum_{bonds}K_r(r-r_q)^2 + \sum_{angles}K_{\theta}(\theta-\theta_eq)^2 + \\
+\sum_{dihedrals}K_{phi}(1+\cos(n\phi)) + \\
+\sum_{i<j}\left[\frac{A_{ij}}{r_ij^{12}} - \frac{B_ij}{r_{ij}^6} \right] + \sum_{i<j}\left[\frac{q_iq_j}{\epsilon r_{ij}} \right] \\
+\end{align*}
+
+The protein structure prediction problem
+\begin{align*}
+\text{conformation}_{native} = \text{arg min}_{r,\theta,\phi} E_{total}(r,\theta,\phi)
+\end{align*}
+
+
+It has been reported that the difference between the native state protein and the unfolded protein has a difference of about 100 kcal/mol \cite{BakerDas2008}. This difference is so large, that often approximations to the energy function that have an error of less than 10\% can be quite accurate in retrieving the lowest energy conformation. Finding the minima in this space can still be hard and there a variety of heuristics that try to sample low energy conformational states. There is an ongoing debate regarding whether the quality of protein structure predictions is affected more by the approximations made in the energy function or the method taken to obtain low energy conformational samples\cite{BakerDas2008}. 
+
+Finally, from a thermodynamic perspective, E is not the function that the biological macromolecule is trying to optimize when it tries to find a native conformation. It is actually optimizing a function G called the free energy. G is defined as $G = E - TS$ where E is the previously mentioned energy function called the Entropy. T is the temperature of the system (normally room temperature), and S is the entropy of the protein. Calculating S, can be very hard as it involves summing over an exponential number of states. Fortunately, E normally far outweighs S and optimizing E is usually sufficient in optimizing G. That said, in some cases the entropy plays a critical role  and can be a crucial factor in determining the minimum energy conformation. There have been some efforts to account for S by using Probabilistic Graphical Models \cite{Hetu2011}. However, this is an active area of research.
+
+\section{Objectives and Timeline}
+For this project we have the following objectives : 
+
+\begin{itemize}
+\item Examine the form of the energy function and identify the components of the energy function that make this function hard to minimize. - By Milestone
+\item Attempt to make a convex relaxation to original energy function - By Milestone
+\item Train parameters for the new energy function - By Mileston
+\item Pose as an easier optimization problem - By Milestone
+\item Evaluate the performance on CASP challenge set - Final presentation
+\item Augment energy function and investigate the role of entropy in structure prediction - If time permits
+\end{itemize}
+
+\subsection{Risks}
+\begin{itemize}
+\item It may be impossible to pose as convex optimization problem
+\item Results may not be accurate at all
+\item Accounting for entropy may be too challenging within the scope of this project
+\end{itemize}
+
+\subsection{Conservative Goals}
+\begin{itemize}
+\item Examine the form of the energy function and identify the components of the energy function that make this function hard to minimize.
+\item Attempt to make a relaxation to original energy function that makes it easier to compute/minimize.
+\item Verify performance on a benchmarkset
+\end{itemize}
+
+
+\section{Resources}
+\begin{itemize}
+\item Rosetta Molecular Modeling Suite - \url{http://www.rosettacommons.org/}
+\item CASP challenge structures - \url{http://www.predictioncenter.org/}
+\item cvxopt- Convex optimization package - \url{http://abel.ee.ucla.edu/cvxopt/}
+\end{itemize}
+
+
+\begin{thebibliography}{9}
+
+\bibitem{BakerDas2008}
+	Das, R, Baker, D. 
+	\emph{Macromolecular modeling with rosetta},
+	Annu. Rev. Biochem., 77:363-82, 
+	2008.
+	
+\bibitem{Hetu2001}	
+	Kamisetty, H, Ramanathan, A, Bailey-Kellogg, C, Langmead, CJ ,
+	\emph{ Accounting for conformational entropy in predicting binding free energies of protein-protein interactions},
+	 Proteins, 79, 2:444-62,
+	2011
+
+\bibitem{Boas2007}
+	Boas, FE, Harbury, PB,
+	\emph{Potential energy functions for protein design},
+	Curr. Opin. Struct. Biol., 17, 2:199-204, 
+	2007
+	
+\end{thebibliography}
+
+
+\end{document}
