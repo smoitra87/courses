@@ -4,8 +4,7 @@
 \usepackage{graphicx}
 
 
-\title{Molecular Mechanics Force Field Optimization}
-
+\title{Molecular Mechanics Force Field Optimization - Rotamer Assignment}
 
 \author{
 Subhodeep Moitra\\
@@ -29,7 +28,7 @@ Physics Department \\
 \section{Introduction}
 In this project we propose to study and optimize molecular mechanics energy functions. Each biological macromolecule has an associated energy function which determines its shape and stability. This energy function E is normally defined in terms of the biophysical properties of the atoms in the macromolecule. E is also related to the three dimensional shape taken by the biological macromolecule. E encompasses electrostatic calculations, van der waals forces and even explicit modelling of the hydrogen bonds \cite{Boas2007}. The macromolecule can assume a number of different conformations or shapes which gives rise to different energy values. The natively occurring conformation is the one that is most stable and also has the lowest energy E*. Finding the global minima of this function is referred to as the \emph{Protein Folding problem}. Minimizing this function is very hard as E has a rugged landscape. This problem is one of the hardest problems facing science today and the solution of which which can lead to many biomedical breakthroughs. 
 
-We first examine in detail the terms in the energy function that make the optimization problem hard. We also present a brief review on some commonly used methods such as conjugate gradient descent which can be used to approximately solve the optimization problem. We  then proceed to show how certain assumptions made about the protein backbone(defined in next section), state space and the form of the energy function can be used to simplify the problem and pose it as an Integer Linear Program(ILP). We attempt to solve a simplified version of the problem called the \emph{Side Chain Prediction problem} \cite{review_paper}. We show connections of the ILP to branch and bound methods such as DEE and A*. We also comment on the conditions under which an IP relaxed to an  LP gives rise to naturally integer solutions. 
+We first examine in detail the terms in the energy function that make the optimization problem hard. We also present a brief review on some commonly used methods such as conjugate gradient descent which can be used to approximately solve the optimization problem. We  then proceed to show how certain assumptions made about the protein backbone(defined in next section), state space and the form of the energy function can be used to simplify the problem and pose it as an Integer Linear Program(ILP). We attempt to solve a simplified version of the problem called the \emph{Side Chain Prediction problem} \cite{scp}. We also comment on the conditions under which an IP relaxed to an  LP gives rise to naturally integer solutions. 
 
 \section{Protein Stucture}
 One important application of energy minimization is to study the protein structure. The structural hierarchy of the protein can
@@ -124,32 +123,80 @@ In the following we show the specific conjugate gradient algorithm which could b
 \section{Simplification to Side Chain Optimization Problem}
 As illustrated in the previous sections, the form of the energy terms are hard to optimize. An example of this is the Lennard Jones potential $\sum_{pairs} (\frac{A_{ij}}{r^{12}_{ij}}-\frac{B_{ij}}{r^{6}_{ij}})$. We explored ways in which the problem can be suitably modified so as to make the problem more tractable. 
 
-In summary we made the following simplifying assumptions :
+We made the following simplifying assumptions :
 \begin{itemize}
-\item Fixed backbone but flexible side chains
-\item Discretize side chain chain angles 
-\item Pairwise energy functions
+\item Fixed backbone but flexible side chains- The $phi, \psi$ and $\omega$ angles are fixed whereas the sidechain $\chi$ angles are allowed to vary.
+\item Discretize side chain chain angles - Rather than optimizing for continous $\chi$ angles, we will be optimizing for discrete $\chi$ states. 
+\item Unit and Pairwise energy functions - $e(i_r)$ and $e(i_r,j_s)$ functions are all that is needed to describe the energy functions.
 \end{itemize}
 
-The problem can then be stated as : 
+This allowed us to concretely model the problem as follows. Consider a $N$ length protein amino acid sequence $A=\{ a_1,\cdots,a_N\}$. Each of the amino acids $a_i$ has a rotameric state $i_r$ taken from the discrete space $i_r \in \{1,\cdots,R_i\}$ where $R_i$ depends on the type of the amino acid. The vector $C = (i_r)$ where $i=\{1,\cdots,N\}$ completely describes the conformational space of the protein. One can precompute all possible rotamer energies as $e_{i_r} = e(i_r)$ and $e_{i_rj_s} = e(i_r,j_s)$. The energy of a particuklar conformation $C$ can be calculated as
 
+\[
+E_C = e_{backbone} + \sum_{i=1}^N e_{i_r} + \sum_i \sum_{j>i} e_{i_rj_s}
+\]
 
+Finding the minimum of this optimization function is a combinatorial optimization problem and the global minimum energy solution to this problem is known as the GMEC (Global Minimum Energy Conformation). We are not concerned about the $e_{backbone}$ term as we keep the backbone fixed. Also the unit energy functions can be folded into the pairwise energy functions as follows. 
+\[
+e'_{i_rj_s} = e_{i_rj_s} + \frac{e_{i_r} + e_{j_s}}{n-1}
+\]
 
+So finding the GMEC actually involves solving : 
+\[
+C^* = \arg \min_{C} E(C) = \arg \min \sum_i \sum_{j>i} e'_{i_rj_s} 
+\]
 
+The side chain placement problem is NP-Hard. This can be seen as a reduction from SAT \cite{nphard}. Knowing this result helps us temper our optimism for finding an efficient solution to the problem. 
 
 \section{Integer Programming Formulation}
-Read Review paper
+The above discrete combinatorial optimization problem can be reformulated as an binary integer program as follows. Define $x_{i_rj_s}$ as a binary integer value that corresponds to selecting rotamer r for amino acid i and rotamer s for amino acid j respectively. 
 
-\section{Relationship to DEE and A*}
-Read review paper
+\[
+\min \sum_i \sum_{r\in R_i} \sum_{j>i} \sum_{s \in R_j} e'_{i_rj_s}x_{i_rj_s} \\
+\]
+
+subject to 
+
+\[
+\sum_{r \in R_i}\sum_{s \in R_j} x_{i_rj_s} = 1  \text{ for all $i$ and $j$}, i<j 
+\]
+\[
+\sum_{q  \in R_h}x_{h_qi_r} = \sum_{p \in R_g}x_{g_pi_r} = \sum_{s \in R_j}x_{i_rj_s} = \sum_{t \in R_k}x_{i_rk_t} 
+\]
+for all $g,h,i,j,k$ such that $g,h<i<j,k$ and for all $r \in R_i$,
+\[
+x_{i_rj_s} \in \{0,1\}
+\]
+
+The above constraints encode that exactly one rotamer per pair of amino acids is to be selected and that all other rotameric assignment should agree with each other. 
+
+Re-formulating the GMEC problem as an integer programming problem has not made it any much easier as binary integer programs are still NP-hard. 
 
 \section{Relaxations to Linear Programming Formulation}
-Read review paper
+By relaxing Integer requirements of $x_{i_rj_s} \in \{0,1\}$ to $x_{i_rj_s} \in [0,1]$ one can solve the relaxed LP problem. It has been noted by~\cite{eriksson} that LP formulations of the side chain problem give rise to Integer solutions. We know that the solution found by an LP relaxation lower bounds the original IP. If the LP solution happens to be integer as well then it is feasible for the original IP and hence the lower bound is tight. This is a curious behavior of the system since there are no explicit constraints that constrain the LP to give integer solutions. 
+
+However this is not always the case and it is possible that there may be non-integer solutions as well~\cite{scp}. 
+
+\subsection{Total Unimodularity}
+Certain types of IPs when relaxes to LPs always give rise to naturally integer solutions such as in network problems (Transportation problem). there are certain conditions under which we can guarantee this such as the condition of Total unimodularity
+\begin{itemize}
+\item An $m \times m$ matrix M is unimodular iff its determinant $|M| \in \{-1,1\}$
+\item  An $m \times n$ matrix M is totally unimodular iff every $m \times m$ non-singular submatrix of M  is unimodular
+\item If in a MIP, the constrains $Ax \leq b$ are such that A is totally unimodular and b is integer then the LP relaxation is naturally integer.
+\end{itemize}
 
 \section{Next Steps}
+There is a lot of biophysics terminology and domain know how needed to solve these biological problems. So far we have managed to significantly abstract the problem in order to focus on core optimization aspects . There are still some details to be ironed out such as the pre-calculation of the rotamer energies using force field functions. 
 
+\paragraph*{} We wish to examine the natural integerness of the side chain placement problem in more detail. In particular find if there are formulations under which the Total Unimodularity conditions can be satisfied. We also wish to research is there a weaker form of total unimodularity that might be at play in the side chain placement problem that regularly(but not always) gives rise to naturally integer solutions.  
 
 \begin{thebibliography}{99}
+
+\bibitem{Boas2007}
+	Boas, FE, Harbury, PB,
+	\emph{Potential energy functions for protein design},
+	Curr. Opin. Struct. Biol., 17, 2:199-204, 
+	2007
 
 \bibitem{protein}
 Pauling L, Corey RB, Branson HR (1951). "The structure of proteins; 
@@ -159,6 +206,16 @@ doi:10.1073\/pnas.37.4.205. PMC 1063337. PMID 14816373
 \bibitem{conjucate}
 N. Andrei, “Conjugate Gradient Algorithms for Molecular Formation Under
 Pairwise Potential Minimization,” Optimization, 2007.
+
+\bibitem{scp}
+Hong, Eun-Jong; Lozano-Pérez, Tomás, "Protein side-chain placement: probabilistic inference and integer programming methods", http://dspace.mit.edu/handle/1721.1/3869
+
+\bibitem{eriksson}
+O Eriksson,Y zhou and A. Elofsson, "Side chain-positioning as an integer programming problem" in WABI. LNCS. vol 2148 Springer. 2001
+
+\bibitem{nphard}
+N Pierce, E. Winfree, "Protein Design is NP-Hard", PEDS, Vol 15, Issue 10
+
 
 
 \end{thebibliography}
