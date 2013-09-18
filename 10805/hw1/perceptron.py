@@ -36,7 +36,9 @@ if __name__ == '__main__' :
 	predict = function(inputs=[x],outputs=o)
 
 
-	def train(X,Y) :
+	def train_perceptron(X,Y) :
+		print('-'*20+'Training Perceptron'+'-'*20)
+		global w
 		converged = False
 		w.set_value(np.random.randn(3))
 		tries = 0
@@ -60,18 +62,75 @@ if __name__ == '__main__' :
 
 	# or
 	Y = map(lambda(_,a,b) : (a or b)*2-1,X)	
-	w = train(X,Y)
+	w = train_perceptron(X,Y)
 
 	# and
 	Y = map(lambda(_,a,b) : (a and b)*2-1,X)
-	w = train(X,Y)
+	w = train_perceptron(X,Y)
 	
 	# xor
 	Y = map(lambda(_,a,b) : (a^b)*2-1,X)
-	w = train(X,Y)
+	w = train_perceptron(X,Y)
 
-	 
+	#-----------------------------------------------------
+	# Now for LMS
+	
+	x,y = T.matrix('x'),T.vector('y') 
+ 
+	o = T.dot(x,w) 
+	eta = 0.01
+	pred = (o > 0)*2-1
+	err = 0.5*((y-o)**2).sum()
+	gw = T.grad(err,w)
+
+	learn_lms = function(
+					inputs=[x,y],
+					outputs = [pred,err],
+					updates = [(w,w -eta*gw )]
+				)
+
+	predict_lms = function([x],pred)
+
+	def train_lms(X,Y) :
+		print('-'*20+'Training LMS'+'-'*20)
+		err_thresh,MaxTries,converged = 0.01,1000,False
+		global w	
+		w.set_value(np.random.randn(3))
+		tries = 0	
+
+		# Run gradient descent
+		while not converged and tries < MaxTries :
+			pred,err = learn_lms(X,Y)
+			if err < err_thresh :
+				converged = True
+			tries +=1
+
+		if converged : 
+			print("LMS converged")			
+		elif tries >= MaxTries : 
+			print("Maximum attemps exceeded")	
+
+		print("Final Loss is ",err)
+		print("Final Prediction is ",predict_lms(X))
+		print("Final weights are:")
+		print(w.get_value())
+
+
+		return w
+
+	# or
+	Y = map(lambda(_,a,b) : (a or b)*2-1,X)
+	w = train_lms(X,Y)
+
+	# and
+	Y = map(lambda(_,a,b) : (a and b)*2-1,X)
+	w = train_lms(X,Y)
+
+	# xor
+	Y = map(lambda(_,a,b) : (a^b)*2-1,X)
+	w = train_lms(X,Y)
 
 	
+
 
 
