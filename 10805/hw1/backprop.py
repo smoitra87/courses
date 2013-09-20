@@ -36,34 +36,40 @@ class NeuralNetwork(object) :
 #		self.do = shared(np.zeros(self.no),name='do')
 
 		# Create the weight matrices
-		self.wih = shared(np.random.uniform(-2,2,(self.ni,self.nh)))
-		self.who = shared(np.random.uniform(-2,2,(self.nh,self.no)))
+		wih = shared(np.random.uniform(-2,2,(self.ni,self.nh)))
+		who = shared(np.random.uniform(-2,2,(self.nh,self.no)))
+		self.wih = wih.get_value()
+		self.who = who.get_value()
+
 
 		# Create the input variables
-		self.ai = T.vector('ai')
+		ai = T.vector('ai')
 	
 		# Create the target variables
-		self.t = T.vector('t')
+		t = T.vector('t')
 
 		# Create the layers
-		self.ah = 1/(1+T.exp(-T.dot(self.ai,self.wih)))
-		self.ao = 1/(1+T.exp(-T.dot(self.ah,self.who)))
+		ah = 1/(1+T.exp(-T.dot(ai,wih)))
+		ao = 1/(1+T.exp(-T.dot(ah,who)))
 
 		# Create the loss function 
-		sqloss = 0.5*((self.t-self.ao)**2).sum() 
-		loss = sqloss + 0.5*self.lam*((self.wih.ravel()**2).sum()\
-				+(self.who.ravel()**2).sum())
+		sqloss = 0.5*((t-ao)**2).sum() 
+		loss = sqloss + 0.5*self.lam*((wih.ravel()**2).sum()\
+				+(who.ravel()**2).sum())
 		
 		# Get the gradients
-		gwih,gwho = T.grad(loss,[self.wih,self.who])
+		gwih,gwho = T.grad(loss,[wih,who])
 
 		# Create the gradient descent training function 
-		self.train_gradient = function(inputs=[self.ai,self.t],
-							outputs=[loss,self.ao],
-							updates=[(self.wih,self.wih-eta*gwih),\
-								(self.who,self.who-eta*gwho)])
+		self.train_gradient = function(inputs=[ai,t],
+							outputs=[loss,ao],
+							updates=[(wih,wih-eta*gwih),\
+								(who,who-eta*gwho)])
 		
-		self.predict = function(inputs=[self.ai],outputs=self.ao)
+		self.predict = function(inputs=[ai],outputs=ao)
+
+		self.get_weights = function(inputs=[],outputs=[wih,who])
+
 
 	def train(self,x,t,mode='theano') : 
 		""" Delegate training to appropriate scheme """
@@ -98,18 +104,47 @@ class NeuralNetwork(object) :
 			prevloss = loss # save current loss
 			currIter +=1 # Increment Iter count
 
+		# Set the final weights
+		self.wih,self.who = self.get_weights()
+
+
 		print("########Final weights are:#########")
 		print("Weights: Input -> Hidden")
-		print(self.wih.get_value())
+		print(self.wih)
 		print("Weights: Hidden -> Output")
-		print(self.who.get_value())
+		print(self.who)
 		print("Predictions :")
 		for x_ in x : 
 			print(x_[1:],'->',self.predict(x_))
 
 	def _train_backprop(self,x,t) : 
 		""" Train using backpropagation"""
-		pass
+	
+		# Create the weight matrices
+		wih = np.random.uniform(-2,2,(self.ni,self.nh))
+		who = np.random.uniform(-2,2,(self.nh,self.no))
+
+		# Create the activation variables
+		ai = np.ones(self.ni)
+		ah = np.zeros(self.nh)
+		ao = np.zeros(self.no)
+
+		# Create the deltas
+		dh = np.zeros(self.nh)
+		do = np.zeros(self.no)
+
+		# Create the layers
+		self.ah = 1/(1+T.exp(-T.dot(self.ai,self.wih)))
+		self.ao = 1/(1+T.exp(-T.dot(self.ah,self.who)))
+
+		# Create the loss function 
+		sqloss = 0.5*((self.t-self.ao)**2).sum() 
+		loss = sqloss + 0.5*self.lam*((self.wih.ravel()**2).sum()\
+				+(self.who.ravel()**2).sum())
+
+		# Run the algorithm until convergence
+	
+
 
 	def test(self) :
 		pass
