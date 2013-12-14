@@ -2,7 +2,7 @@
 
 #######################################################################
 # Backpropogation for Neural Networks
-# Deep Learning Lab 1 
+# Deep Learning Lab 1
 # Author: Subhodeep Moitra (smoitra@cs.cmu.edu)
 #######################################################################
 
@@ -16,7 +16,7 @@ import numpy as np
 from itertools import product
 
 
-class NeuralNetwork(object) : 
+class NeuralNetwork(object) :
 	""" simple Implementation of a 2 layer neural network """
 	def __init__(self,ni,nh,no,eta=0.1,lam=0) :
 		self.ni = ni+1
@@ -44,7 +44,7 @@ class NeuralNetwork(object) :
 
 		# Create the input variables
 		ai = T.vector('ai')
-	
+
 		# Create the target variables
 		t = T.vector('t')
 
@@ -52,26 +52,26 @@ class NeuralNetwork(object) :
 		ah = 1/(1+T.exp(-T.dot(ai,wih)))
 		ao = 1/(1+T.exp(-T.dot(ah,who)))
 
-		# Create the loss function 
-		sqloss = 0.5*((t-ao)**2).sum() 
+		# Create the loss function
+		sqloss = 0.5*((t-ao)**2).sum()
 		loss = sqloss + 0.5*self.lam*((wih.ravel()**2).sum()\
 				+(who.ravel()**2).sum())
-		
+
 		# Get the gradients
 		gwih,gwho = T.grad(loss,[wih,who])
 
-		# Create the gradient descent training function 
+		# Create the gradient descent training function
 		self.train_gradient = function(inputs=[ai,t],
 							outputs=[loss,ao],
 							updates=[(wih,wih-eta*gwih),\
 								(who,who-eta*gwho)])
-		
+
 		self.predict = function(inputs=[ai],outputs=ao)
 
 		self.get_weights = function(inputs=[],outputs=[wih,who])
 
 
-	def train(self,x,t,mode='theano') : 
+	def train(self,x,t,mode='theano') :
 		""" Delegate training to appropriate scheme """
 
 		# Add a 1 dummy input for bias
@@ -82,7 +82,7 @@ class NeuralNetwork(object) :
 		else :
 			self._train_backprop(x,t)
 
-	def _train_theano(self,x,t,maxIter=10e3,eps=10e-3) : 
+	def _train_theano(self,x,t,maxIter=10e3,eps=10e-3) :
 		""" Train using Theano gradient calculations"""
 		print('-'*20+'Training with Theano'+'-'*20)
 		converged = False
@@ -90,17 +90,17 @@ class NeuralNetwork(object) :
 		loss,prevloss = sys.maxint,0
 
 		while not converged and currIter < maxIter :
-			loss = 0 
-			for x_,t_ in zip(x,t) : 
+			loss = 0
+			for x_,t_ in zip(x,t) :
 				# Loop over every training instance
 				instanceLoss,out = self.train_gradient(x_,t_)
 				loss += instanceLoss
-			if np.abs(loss- prevloss) < eps : 
+			if np.abs(loss- prevloss) < eps :
 				converged = True
 
 			# print progress
 			if currIter%100 :
-				print('iter:{0} ; loss:{1}'.format(currIter,loss)) 				
+				print('iter:{0} ; loss:{1}'.format(currIter,loss))
 			prevloss = loss # save current loss
 			currIter +=1 # Increment Iter count
 
@@ -114,12 +114,12 @@ class NeuralNetwork(object) :
 		print("Weights: Hidden -> Output")
 		print(self.who)
 		print("Predictions :")
-		for x_ in x : 
+		for x_ in x :
 			print(x_[1:],'->',self.predict(x_))
 
-	def _train_backprop(self,x,t) : 
+	def _train_backprop(self,x,t) :
 		""" Train using backpropagation"""
-	
+
 		# Create the weight matrices
 		wih = np.random.uniform(-2,2,(self.ni,self.nh))
 		who = np.random.uniform(-2,2,(self.nh,self.no))
@@ -137,37 +137,37 @@ class NeuralNetwork(object) :
 		self.ah = 1/(1+T.exp(-T.dot(self.ai,self.wih)))
 		self.ao = 1/(1+T.exp(-T.dot(self.ah,self.who)))
 
-		# Create the loss function 
-		sqloss = 0.5*((self.t-self.ao)**2).sum() 
+		# Create the loss function
+		sqloss = 0.5*((self.t-self.ao)**2).sum()
 		loss = sqloss + 0.5*self.lam*((self.wih.ravel()**2).sum()\
 				+(self.who.ravel()**2).sum())
 
 		# Run the algorithm until convergence
-	
+
 
 
 	def test(self) :
 		pass
-	
-	def update(self) : 
+
+	def update(self) :
 		pass
 
-	def backprop(self) : 
+	def backprop(self) :
 		pass
 
-	def getweights(self) : 
+	def getweights(self) :
 		pass
 
 
 
-if __name__ == '__main__' : 
-	
+if __name__ == '__main__' :
+
 	# Create a neural network
 	nn = NeuralNetwork(2,2,1)
 
 	# Create the XOR dataset
 	x = list(product([0,1],[0,1]))
-	t = map(lambda(a,b) : (a^b),x)	
+	t = map(lambda(a,b) : (a^b),x)
 	t = [[y] for y in t]
 
 	# Train the neural network
