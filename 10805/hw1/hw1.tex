@@ -23,11 +23,11 @@
 \item Weights : 
 \begin{verbatim}
 --------------------Training Perceptron--------------------
-# AND
+# OR
 Final weights are:
 [-0.06313892  1.08293573  0.25872327]
 --------------------Training Perceptron--------------------
-# OR
+# AND
 Final weights are:
 [-0.61185395  0.45884488  0.23660592]
 --------------------Training Perceptron--------------------
@@ -45,5 +45,32 @@ Final weights are:
 %--
 
 
+\section{Delta Learning Rule}
+
+\begin{itemize}
+
+
+\item Weights:
+\begin{verbatim}
+--------------------Training LMS--------------------
+# OR
+('Final Prediction is ', array([-1,  1,  1,  1], dtype=int8))
+Final weights are:
+[-0.49756501  0.99798273  0.99791152]
+--------------------Training LMS--------------------
+# AND
+('Final Prediction is ', array([-1, -1, -1,  1], dtype=int8))
+Final weights are:
+[-1.49595175  0.99657259  0.99660149]
+--------------------Training LMS--------------------
+# XOR
+('Final Loss is ', array(2.00000001864034))
+('Final Prediction is ', array([ 1,  1, -1, -1], dtype=int8))
+Final weights are:
+[  1.44805136e-04  -1.71599098e-04  -7.25627296e-05]
+
+\end{verbatim}
+
+\end{itemize}
 
 \end{document}

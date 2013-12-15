@@ -15,11 +15,47 @@ from operator import xor
 
 import numpy as np
 
+maxTries = 500;
 
 if __name__ == '__main__':
 
-    X = list(product([0, 1], [0, 1]))
-    X = [[1]+list(t) for t in X]
+    from argparse import ArgumentParser
+    parser = ArgumentParser(description='Which Experiment to run')
+    parser.add_argument('--logic',action='store_true',default=False,
+                        help='Run Perceptron with logic gates')
+    parser.add_argument('--data',action='store_true',default=False,
+                        help='Run Perceptron with Data provided')
+    parser.add_argument('--plot',action='store_true',default=False,
+                        help='Make Plots of the data')
+    args = parser.parse_args()
+
+    # Create Logic data
+    if args.logic:
+        X = list(product([0, 1], [0, 1]))
+        X = [[1]+list(t) for t in X]
+
+    # Load data files
+    if args.data:
+        def shrink_decorator(fn):
+            def shrink_wrapper(fin):
+                shrinker = lambda l: l if len(l) > 1 else l[0]
+                array = fn(fin)
+                return map(shrinker,array)
+            return shrink_wrapper
+
+        @shrink_decorator
+        def csvreader(fin):
+            return [map(float,line.strip().split(',')) for line in fin]
+
+        Xtrain = [] ; ytrain = []
+        Xtest = [] ; ytest = []
+        for i in range(1,4+1):
+            for l,s in zip([Xtrain,Xtest,ytrain,ytest],
+                           ['X%d_train.csv','X%d_test.csv',
+                            'y%d_train.csv','y%d_test.csv']):
+                f = os.path.join('data',s%(i))
+                with open(f) as fin:
+                    l.append(csvreader(fin))
 
     x, y = T.vector('x'), T.scalar('y')
     w = shared(np.random.randn(3), name='w')
@@ -40,7 +76,8 @@ if __name__ == '__main__':
         print('-'*20+'Training Perceptron'+'-'*20)
         global w
         converged = False
-        w.set_value(np.random.randn(3))
+        nInputs = len(X[0])
+        w.set_value(np.random.randn(nInputs))
         tries = 0
         while not converged:
             errorCount = 0
@@ -51,7 +88,7 @@ if __name__ == '__main__':
             if errorCount == 0:
                 converged = True
             tries += 1
-            if tries > 100:
+            if tries > maxTries:
                 print("###### Not Converged ######")
                 break
 
@@ -60,17 +97,33 @@ if __name__ == '__main__':
 
         return w
 
-    # or
-    Y = map(lambda __a_b: (__a_b[1] or __a_b[2])*2-1, X)
-    w = train_perceptron(X, Y)
+    if args.logic:
 
-    # and
-    Y = map(lambda __a_b1: (__a_b1[1] and __a_b1[2])*2-1, X)
-    w = train_perceptron(X, Y)
+        # or
+        Y = map(lambda __a_b: (__a_b[1] or __a_b[2])*2-1, X)
+        w = train_perceptron(X, Y)
 
-    # xor
-    Y = map(lambda __a_b2: (__a_b2[1] ^ __a_b2[2])*2-1, X)
-    w = train_perceptron(X, Y)
+        # and
+        Y = map(lambda __a_b1: (__a_b1[1] and __a_b1[2])*2-1, X)
+        w = train_perceptron(X, Y)
+
+        # xor
+        Y = map(lambda __a_b2: (__a_b2[1] ^ __a_b2[2])*2-1, X)
+        w = train_perceptron(X, Y)
+
+    if args.data:
+        for i in range(4) :
+            print
+            print("Running perceptron for Dataset %d"%i)
+            for X,Y in zip((Xtrain[i],Xtest[i]),(ytrain[i],ytest[i])):
+                # Zero mean center the data
+                X = np.asarray(X)
+                mean,std = X.mean(axis=0),X.std(axis=0)
+                X = (X -mean)/std
+                X = np.hstack((np.ones((X.shape[0],1)),X))
+                w = train_perceptron(X,Y)
+
+
 
     #-----------------------------------------------------
     # Now for LMS
@@ -95,7 +148,8 @@ if __name__ == '__main__':
         print('-'*20+'Training LMS'+'-'*20)
         err_thresh, MaxTries, converged = 0.01, 1000, False
         global w
-        w.set_value(np.random.randn(3))
+        nInputs = len(X[0])
+        w.set_value(np.random.randn(nInputs))
         tries = 0
 
         # Run gradient descent
@@ -117,14 +171,28 @@ if __name__ == '__main__':
 
         return w
 
-    # or
-    Y = map(lambda __a_b3: (__a_b3[1] or __a_b3[2])*2-1, X)
-    w = train_lms(X, Y)
+    if args.logic:
+        # or
+        Y = map(lambda __a_b3: (__a_b3[1] or __a_b3[2])*2-1, X)
+        w = train_lms(X, Y)
 
-    # and
-    Y = map(lambda __a_b4: (__a_b4[1] and __a_b4[2])*2-1, X)
-    w = train_lms(X, Y)
+        # and
+        Y = map(lambda __a_b4: (__a_b4[1] and __a_b4[2])*2-1, X)
+        w = train_lms(X, Y)
 
-    # xor
-    Y = map(lambda __a_b5: (__a_b5[1] ^ __a_b5[2])*2-1, X)
-    w = train_lms(X, Y)
+        # xor
+        Y = map(lambda __a_b5: (__a_b5[1] ^ __a_b5[2])*2-1, X)
+        w = train_lms(X, Y)
+
+    if args.data:
+        for i in range(4) :
+            print
+            print("Running perceptron for Dataset %d"%i)
+            for X,Y in zip((Xtrain[i],Xtest[i]),(ytrain[i],ytest[i])):
+                # Zero mean center the data
+                X = np.asarray(X)
+                mean,std = X.mean(axis=0),X.std(axis=0)
+                X = (X -mean)/std
+                X = np.hstack((np.ones((X.shape[0],1)),X))
+                w = train_lms(X,Y)
+
