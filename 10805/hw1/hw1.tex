@@ -1,0 +1,49 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{fullpage}
+\usepackage{amsmath,amssymb,amsthm}
+%\usepackage[square]{natbib}
+\usepackage{color}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\begin{document}
+
+\title{10805 Lab 1}
+\author{Subhodeep Moitra \\ {\tt subhodee@andrew.cmu.edu}}
+\date{}
+
+\maketitle
+
+\section{Perceptron}
+
+\subsection{Perceptron learning rule}
+\begin{enumerate}
+
+\item Weights : 
+\begin{verbatim}
+--------------------Training Perceptron--------------------
+# AND
+Final weights are:
+[-0.06313892  1.08293573  0.25872327]
+--------------------Training Perceptron--------------------
+# OR
+Final weights are:
+[-0.61185395  0.45884488  0.23660592]
+--------------------Training Perceptron--------------------
+# XOR
+###### Not Converged ######
+Final weights are:
+[ 0.02961735 -0.06937551 -0.35582819]
+\end{verbatim}
+
+\item 0 values don't allow change of weights using the perceptron, hence the transformation to -1,1
+
+\end{enumerate}
+
+\subsection{Visualize hypothesis space}
+%--
+
+
+
+\end{document}
