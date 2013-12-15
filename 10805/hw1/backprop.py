@@ -121,17 +121,17 @@ class NeuralNetwork(object) :
 		""" Train using backpropagation"""
 	
 		# Create the weight matrices
-		wih = np.random.uniform(-2,2,(self.ni,self.nh))
-		who = np.random.uniform(-2,2,(self.nh,self.no))
+		self.wih = np.random.uniform(-2,2,(self.ni,self.nh))
+		self.who = np.random.uniform(-2,2,(self.nh,self.no))
 
 		# Create the activation variables
-		ai = np.ones(self.ni)
-		ah = np.zeros(self.nh)
-		ao = np.zeros(self.no)
+		self.ai = np.ones(self.ni)
+		self.ah = np.zeros(self.nh)
+		self.ao = np.zeros(self.no)
 
 		# Create the deltas
-		dh = np.zeros(self.nh)
-		do = np.zeros(self.no)
+		self.dh = np.zeros(self.nh)
+		self.do = np.zeros(self.no)
 
 		# Create the layers
 		self.ah = 1/(1+T.exp(-T.dot(self.ai,self.wih)))
@@ -142,8 +142,7 @@ class NeuralNetwork(object) :
 		loss = sqloss + 0.5*self.lam*((self.wih.ravel()**2).sum()\
 				+(self.who.ravel()**2).sum())
 
-		# Run the algorithm until convergence
-	
+		# Run the algorithm until convergence	
 
 
 	def test(self) :
