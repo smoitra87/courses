@@ -13,6 +13,9 @@ from theano import function, shared
 from itertools import product
 from operator import xor
 
+import matplotlib.pyplot as plt
+
+
 import numpy as np
 
 maxTries = 500;
@@ -23,10 +26,12 @@ if __name__ == '__main__':
     parser = ArgumentParser(description='Which Experiment to run')
     parser.add_argument('--logic',action='store_true',default=False,
                         help='Run Perceptron with logic gates')
-    parser.add_argument('--data',action='store_true',default=False,
+    parser.add_argument('--dataperc',action='store_true',default=False,
                         help='Run Perceptron with Data provided')
     parser.add_argument('--plot',action='store_true',default=False,
                         help='Make Plots of the data')
+    parser.add_argument('--datalms',action='store_true',default=False,
+                        help='Run LMS with Data provided')
     args = parser.parse_args()
 
     # Create Logic data
@@ -35,7 +40,7 @@ if __name__ == '__main__':
         X = [[1]+list(t) for t in X]
 
     # Load data files
-    if args.data:
+    if args.datalms or args.dataperc:
         def shrink_decorator(fn):
             def shrink_wrapper(fin):
                 shrinker = lambda l: l if len(l) > 1 else l[0]
@@ -111,17 +116,44 @@ if __name__ == '__main__':
         Y = map(lambda __a_b2: (__a_b2[1] ^ __a_b2[2])*2-1, X)
         w = train_perceptron(X, Y)
 
-    if args.data:
+    if args.dataperc:
         for i in range(4) :
             print
             print("Running perceptron for Dataset %d"%i)
-            for X,Y in zip((Xtrain[i],Xtest[i]),(ytrain[i],ytest[i])):
-                # Zero mean center the data
-                X = np.asarray(X)
-                mean,std = X.mean(axis=0),X.std(axis=0)
-                X = (X -mean)/std
-                X = np.hstack((np.ones((X.shape[0],1)),X))
-                w = train_perceptron(X,Y)
+
+            # Train only on train data
+            X,Y = Xtrain[i],ytrain[i]
+            # Zero mean center the data
+            X = np.asarray(X); Y = np.asarray(Y)
+            mean = X.mean(axis=0)
+            X = X -mean
+            maxVals = np.max(np.abs(X),axis=0)
+            X = X/maxVals
+            X = np.hstack((np.ones((X.shape[0],1)),X))
+            w = train_perceptron(X,Y)
+
+            # predict on test data
+            testX,testY = Xtest[i],ytest[i]
+            testX = (testX-mean)/maxVals
+            predY = [predict(x) for x in np.hstack((np.ones((testX.shape[0],1)),testX))]
+            predY = np.asarray(predY,int)
+
+            X,Y = np.asarray(Xtest[i]),np.asarray(ytest[i])
+            X = (X-mean)/maxVals
+
+
+            if args.plot:
+                fig,ax = plt.subplots()
+                ax.plot(X[Y==-1,0],X[Y==-1,1],'ro')
+                ax.plot(X[Y==1,0],X[Y==1,1],'bo')
+                xboundary =  np.linspace(-1,1,20)
+                w_train = w.get_value()
+                yboundary = [-w_train[1]*x/w_train[2] for x in xboundary]
+                ax.plot(xboundary,yboundary,ls='--',lw=2,color='green')
+                ax.set_title('Decision Boundary for Dataset %d'%(i+1))
+                plt.savefig('percepDataset%d.png'%(i+1))
+                plt.close()
+
 
 
 
@@ -184,7 +216,7 @@ if __name__ == '__main__':
         Y = map(lambda __a_b5: (__a_b5[1] ^ __a_b5[2])*2-1, X)
         w = train_lms(X, Y)
 
-    if args.data:
+    if args.datalms:
         for i in range(4) :
             print
             print("Running perceptron for Dataset %d"%i)
